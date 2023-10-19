@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+
 
 class TestPage extends StatefulWidget {
   final List<bool> isSelected;
+  final XFile? capturedImage;
 
-  TestPage({required this.isSelected});
+  TestPage({required this.isSelected, this.capturedImage});
 
   @override
   _TestPageState createState() => _TestPageState();
@@ -72,8 +76,14 @@ class _TestPageState extends State<TestPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('$num1 * $num2', style: TextStyle(fontSize: 200)),
-            SizedBox(height: 160.0),
+            if (widget.capturedImage != null)
+              Image.file(
+                File(widget.capturedImage!.path),
+                width: 300, // 您可以調整這些參數
+                height: 300,
+              ),
+            Text('$num1 X $num2 = ?', style: TextStyle(fontSize: 150)),
+            SizedBox(height: 40.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround, // 設置主軸上的空間分配
               children: options.asMap().entries.map((entry) {

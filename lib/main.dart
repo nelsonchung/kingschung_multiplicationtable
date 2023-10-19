@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
-import 'setting_page.dart';
 import 'test_page.dart';
+import 'setting_page.dart';
+import 'package:image_picker/image_picker.dart';
 
 void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,17 +27,35 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  XFile? _imageFile;
   int _currentIndex = 0;
-
-  // 初始化isSelected列表
   List<bool> isSelected = [true, true, true, true, true, true, true, true];
+  late List<Widget> _children;
 
-  late List<Widget> _children; // 移除final標記
+  final ImagePicker _picker = ImagePicker();
 
-  _MyHomePageState() {
+  _imgFromCamera() async {
+    XFile? image = await _picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 50,
+    );
+
+    setState(() {
+      _imageFile = image;
+    });
+
+    // 新增這一行來更新TestPage
+    _children[0] = TestPage(isSelected: isSelected, capturedImage: _imageFile);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _imgFromCamera();
     _children = [
-      TestPage(isSelected: isSelected),
-      SettingPage(), // 如果SettingPage也需要這個列表，您可以傳遞它
+      TestPage(isSelected: isSelected, capturedImage: _imageFile),
+      SettingPage(),
+      // 如果有其他頁面，例如 SettingPage，請在此添加
     ];
   }
 
@@ -42,8 +66,8 @@ class _MyHomePageState extends State<MyHomePage> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         backgroundColor: Color.fromARGB(255, 150, 232, 27),
-        selectedItemColor: const Color.fromARGB(255, 250, 228, 23), // 選中的項目顏色
-        unselectedItemColor: Color.fromARGB(255, 104, 129, 206), // 未選中的項目顏色
+        selectedItemColor: const Color.fromARGB(255, 250, 228, 23),
+        unselectedItemColor: Color.fromARGB(255, 104, 129, 206),
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.quiz),
