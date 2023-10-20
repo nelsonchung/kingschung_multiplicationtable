@@ -35,9 +35,11 @@ class _MyHomePageState extends State<MyHomePage> {
   final ImagePicker _picker = ImagePicker();
 
   _imgFromCamera() async {
+
     XFile? image = await _picker.pickImage(
       source: ImageSource.camera,
-      imageQuality: 50,
+      imageQuality: 100,
+      preferredCameraDevice: CameraDevice.front
     );
 
     setState(() {
