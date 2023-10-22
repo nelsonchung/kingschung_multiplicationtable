@@ -35,6 +35,7 @@ class ResultPage extends StatelessWidget {
           children: <Widget>[
             Text("你正確回答了 $correctQuestions / $totalQuestions 個問題！", style: TextStyle(fontSize: 60, fontWeight: FontWeight.bold)),
             //style: TextStyle(fontSize: 120)),
+            /*
             ElevatedButton(
               onPressed: () {
                 //Navigator.pop(context); // 返回上一頁
@@ -47,7 +48,7 @@ class ResultPage extends StatelessWidget {
                 );
               },
               child: Text('返回主畫面'),
-            )
+            )*/
           ],
         ),
       ),

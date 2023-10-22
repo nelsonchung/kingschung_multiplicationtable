@@ -44,8 +44,10 @@ class _TestPageState extends State<TestPage> {
   //final player = AudioPlayer();
   //final AudioCache audioCache = AudioCache();
   //final assetsAudioPlayer = AssetsAudioPlayer();
-  final player_correct = AudioPlayer();   
-  final player_error = AudioPlayer();   
+  //final player_correct = AudioPlayer();   
+  //final player_error = AudioPlayer();   
+  //final AudioPlayer audioPlayer = AudioPlayer();
+  final audioPlayer = AudioPlayer();
 
   @override
   void initState() {
@@ -57,8 +59,13 @@ class _TestPageState extends State<TestPage> {
     final duration_correct = player_correct.setUrl('asset: audio/correct_sound_clap.mp3');
     final duration_error = player_error.setUrl('asset: audio/error_sound_mock.mp3');
     */
-    final duration_correct = player_correct.setUrl('https://firebasestorage.googleapis.com/v0/b/groupbuying-9d07b.appspot.com/o/products%2Fcorrect_sound_clap.mp3?alt=media&token=f2f3e3dd-46f5-455c-a141-46a653c5d0b6&_gl=1*o34vfi*_ga*MjA4NjM0NDA0Ny4xNjkwMzg0NDky*_ga_CW55HF8NVT*MTY5Nzk0NzgxNS4xMTQuMS4xNjk3OTQ3OTA4LjQ5LjAuMA..');
-    final duration_error = player_error.setUrl('https://firebasestorage.googleapis.com/v0/b/groupbuying-9d07b.appspot.com/o/products%2Ferror_sound_mock.mp3?alt=media&token=92c9c07b-1242-4981-8416-aa2d0ad1b7d7&_gl=1*1s16ehq*_ga*MjA4NjM0NDA0Ny4xNjkwMzg0NDky*_ga_CW55HF8NVT*MTY5Nzk0NzgxNS4xMTQuMS4xNjk3OTQ3OTU1LjIuMC4w');
+    //Using just_audio
+    //final duration_correct = player_correct.setUrl('https://firebasestorage.googleapis.com/v0/b/groupbuying-9d07b.appspot.com/o/products%2Fcorrect_sound_clap.mp3?alt=media&token=f2f3e3dd-46f5-455c-a141-46a653c5d0b6&_gl=1*o34vfi*_ga*MjA4NjM0NDA0Ny4xNjkwMzg0NDky*_ga_CW55HF8NVT*MTY5Nzk0NzgxNS4xMTQuMS4xNjk3OTQ3OTA4LjQ5LjAuMA..');
+    //final duration_error = player_error.setUrl('https://firebasestorage.googleapis.com/v0/b/groupbuying-9d07b.appspot.com/o/products%2Ferror_sound_mock.mp3?alt=media&token=92c9c07b-1242-4981-8416-aa2d0ad1b7d7&_gl=1*1s16ehq*_ga*MjA4NjM0NDA0Ny4xNjkwMzg0NDky*_ga_CW55HF8NVT*MTY5Nzk0NzgxNS4xMTQuMS4xNjk3OTQ3OTU1LjIuMC4w');
+    //player_correct.setSource(AssetSource('audio/correct_sound_clap.mp3'));
+    //player_error.setSource(AssetSource('audio/error_sound_mock.mp3'));
+    
+    //Load the preference
     _loadPreferences().then((_) {
       _loadSettings();
       _readImageFileFromDisk();
@@ -268,14 +275,17 @@ void _generateQuestion() {
       //使用 flutterTts speak
       //flutterTts.speak("Correct Answer");
       //flutterTts.speak("正確答案");
-      player_correct.play();
-      //player_correct.stop();
-      //await player_correct.seek(Duration(second: 0));
+
+      // URL source: https://firebasestorage.googleapis.com/v0/b/groupbuying-9d07b.appspot.com/o/products%2Fcorrect_sound_clap_0_4.mp3?alt=media&token=1c807127-295b-4a6e-bbdf-0612f2acde85&_gl=1*jkdemm*_ga*MjA4NjM0NDA0Ny4xNjkwMzg0NDky*_ga_CW55HF8NVT*MTY5Nzk4MjI0OS4xMTUuMS4xNjk3OTgyNTIzLjUzLjAuMA..
+      final duration = audioPlayer.setUrl('https://firebasestorage.googleapis.com/v0/b/groupbuying-9d07b.appspot.com/o/products%2Fcorrect_sound_clap_0_4.mp3?alt=media&token=1c807127-295b-4a6e-bbdf-0612f2acde85&_gl=1*jkdemm*_ga*MjA4NjM0NDA0Ny4xNjkwMzg0NDky*_ga_CW55HF8NVT*MTY5Nzk4MjI0OS4xMTUuMS4xNjk3OTgyNTIzLjUzLjAuMA..');
+      audioPlayer.play();
     } else {
+      //使用 flutterTts speak
       //flutterTts.speak("Wrong Answer");
       //flutterTts.speak("答錯囉，加油");
-      player_error.play();
-      //player_error.stop();
+
+      final duration = audioPlayer.setUrl('https://firebasestorage.googleapis.com/v0/b/groupbuying-9d07b.appspot.com/o/products%2Ferror_sound_mock.mp3?alt=media&token=92c9c07b-1242-4981-8416-aa2d0ad1b7d7&_gl=1*1n2gdvg*_ga*MjA4NjM0NDA0Ny4xNjkwMzg0NDky*_ga_CW55HF8NVT*MTY5Nzk4MjI0OS4xMTUuMS4xNjk3OTgyMjk5LjEwLjAuMA..');
+      audioPlayer.play();
     }
 
     setState(() {});
@@ -294,8 +304,9 @@ void _generateQuestion() {
   @override
   void dispose() {
     _timer.cancel();
-    player_correct.dispose();
-    player_error.dispose();
+    //player_correct.dispose();
+    //player_error.dispose();
+    audioPlayer.stop();
     super.dispose();
   }
 
