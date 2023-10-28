@@ -1,28 +1,59 @@
-// multiplicationtable_page.dart
 import 'package:flutter/material.dart';
 
-class MultiplicationTablePage extends StatelessWidget {
+class MultiplicationTablePage extends StatefulWidget {
+  @override
+  _MultiplicationTablePageState createState() =>
+      _MultiplicationTablePageState();
+}
+
+class _MultiplicationTablePageState extends State<MultiplicationTablePage> {
+  List<List<bool>> flippedCards = List.generate(9, (i) => List.filled(8, false));
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("九九乘法表"),
-        backgroundColor: Colors.yellow, // 將AppBar的背景色設為黃色
+        backgroundColor: Colors.yellow,
       ),
-      backgroundColor: Colors.yellow,  // 黃色背景
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(54.0),
-          child: Table(
-            border: TableBorder.all(color: Colors.black),
-            children: _generateTable(),
+      backgroundColor: Colors.yellow,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,  // 添加此行
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(68.0),
+              child: Table(
+                border: TableBorder.all(color: Colors.black),
+                children: _generateTable(),
+              ),
+            ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.all(75.0),
+            child: ElevatedButton.icon(
+              onPressed: _resetTable,
+              icon: Icon(Icons.refresh, size: 30),
+              label: Text('重置', style: TextStyle(fontSize: 20)),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.yellow, // 設置按鈕的背景色為黃色
+                onPrimary: Colors.black, // 設置按鈕上文字和圖標的顏色
+                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
 
-List<TableRow> _generateTable() {
+  void _resetTable() {
+    setState(() {
+      flippedCards = List.generate(9, (i) => List.filled(8, false));
+    });
+  }
+
+  List<TableRow> _generateTable() {
     List<TableRow> rows = [];
     final colors = [
       Colors.red,
@@ -36,18 +67,23 @@ List<TableRow> _generateTable() {
       Colors.brown
     ];
     for (int j = 1; j <= 9; j++) {
-      // 將外層循環改為j
       List<Widget> cols = [];
       for (int i = 2; i <= 9; i++) {
-        // 將內層循環改為i
-        cols.add(Container(
-          //color: colors[(i + j) % colors.length], // 使用不同的顏色來呈現, 呈現的結果會是以斜線為同一個顏色的方式作呈現
-          color: colors[i - 2],  // 使用 i - 2 作為索引來選擇顏色
-          padding: EdgeInsets.all(12.0),
-          child: Center(
-            child: Text(
-              '$i x $j = ${i * j}',
-              style: TextStyle(fontWeight: FontWeight.bold),
+        cols.add(GestureDetector(
+          onTap: () {
+            setState(() {
+              flippedCards[j - 1][i - 2] = !flippedCards[j - 1][i - 2];
+            });
+          },
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 500),
+            color: colors[i - 2],
+            padding: EdgeInsets.all(12.0),
+            child: Center(
+              child: Text(
+                flippedCards[j - 1][i - 2] ? '${i * j}' : '$i x $j',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),  // 調整字型大小
+              ),
             ),
           ),
         ));
@@ -56,5 +92,4 @@ List<TableRow> _generateTable() {
     }
     return rows;
   }
-
 }
