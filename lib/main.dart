@@ -92,15 +92,21 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _imgFromCamera().then((_) {
-      // 這將會在獲取圖像後被呼叫
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MainPage(),
-        ),
-      );
-    });  // 這個括弧和分號是你缺少的
+      // 这将在获取图像后被调用
+      if (_imageFile == null) {
+        // 用户按下取消按钮，可以在这里处理退出应用程序的逻辑
+        exit(0); // 使用exit函数退出应用程序
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MainPage(),
+          ),
+        );
+      }
+    });
   }
+
 
   @override
   Widget build(BuildContext context) {
