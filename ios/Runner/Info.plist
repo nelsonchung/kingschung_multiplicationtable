@@ -48,7 +48,7 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>我們需要你允許權限去拍出屬於你的美照</string>	
+	<string>我們需要訪問您的相機來讓您拍攝照片，並且能夠在進行遊戲時顯示你的照片。例如，您可以使用相機拍攝新照片並在開始計時後出現你的照片。</string>	
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>我們需要你允許權限去存取相片簿</string>
 	<key>NSFileProviderPresenceUsageDescription</key>
