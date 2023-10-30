@@ -13,6 +13,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 //import 'package:audioplayers/audioplayers.dart';
 import 'package:just_audio/just_audio.dart';
 
+
 class TestPage extends StatefulWidget {
   TestPage(); 
 
@@ -21,22 +22,22 @@ class TestPage extends StatefulWidget {
 }
 
 class _TestPageState extends State<TestPage> {
-  late int num1, num2, correctAnswer;
-  late List<int> options;
-  late List<Color> optionColors;
+  int num1=9, num2=9, correctAnswer=0;
+  List<int> options = [5, 5];
+  List<Color> optionColors = [Colors.blue, Colors.blue];
   List<bool> isSelected = [];
 
   String? currentImagePath;
 
-  late int remainingTime; // 剩餘時間（秒）
-  late int totalQuestions; // 總問題數
-  late int completedQuestions = 0; // 已完成問題數
-  late int correctQuestions = 0; // 正確問題數
+  int remainingTime = 5; // 剩餘時間（秒）
+  int totalQuestions = 10; // 總問題數
+  int completedQuestions = 0; // 已完成問題數
+  int correctQuestions = 0; // 正確問題數
   late Timer _timer;
   //late Timer _remainingTimeTimer;  // 專門用於控制 remainingTime
   //late Timer _currentIntervalTimer;  // 專門用於控制 currentIntervalTime
   late int intervalTime;  // 間隔時間（秒）
-  late int currentIntervalTime;
+  late int currentIntervalTime = 5;
   late int answeredQuestions = 0;
 
   // Text to audio
@@ -48,6 +49,24 @@ class _TestPageState extends State<TestPage> {
   //final player_error = AudioPlayer();   
   //final AudioPlayer audioPlayer = AudioPlayer();
   final audioPlayer = AudioPlayer();
+
+  bool isTablet(BuildContext context) {
+    // 獲得裝置的實際（邏輯）寬度和高度
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+
+    // 獲得裝置的像素密度
+    double pixelDensity = MediaQuery.of(context).devicePixelRatio;
+
+    // 計算對角線長度
+    double screenDiagonal = sqrt(width * width + height * height);
+
+    // 計算實際的對角線尺寸（英寸）
+    double screenDiagonalInches = screenDiagonal / (pixelDensity * 160);
+
+    // 如果對角線尺寸大於 7 英寸，則通常被認為是平板
+    return screenDiagonalInches >= 7.0;
+  }
 
   @override
   void initState() {
@@ -191,32 +210,50 @@ void _delay1secondstogeneratedQuestion() {
   }
 
 void _generateQuestion() {
-  // 取消前一個問題的 Timer（如果有的話）
-  _timer.cancel();
+  print('開始生成問題...');
 
-  List<int> availableNumbers = [];
+  // 取消前一個問題的 Timer（如果有的話）
+  if (_timer.isActive) {
+    print('取消前一個問題的 Timer');
+    _timer.cancel();
+  }
+
+  print('Announcement availableNumbers');
+  List<int> availableNumbers = [2, 3, 4, 5, 6, 7, 8, 9];
+  print('可用的數字：$availableNumbers');
   for (int i = 2; i <= 9; i++) {
     if (isSelected[i - 2]) availableNumbers.add(i);
   }
+  print('可用的數字：$availableNumbers');
 
-  if (availableNumbers.isEmpty) return;
+  if (availableNumbers.isEmpty) {
+    print('沒有選擇任何數字，退出函數');
+    return;
+  }
 
   Random rand = Random();
   num1 = availableNumbers[rand.nextInt(availableNumbers.length)];
   num2 = availableNumbers[rand.nextInt(availableNumbers.length)];
+  print('選擇的兩個數字：$num1 和 $num2');
+
   correctAnswer = num1 * num2;
+  print('正確答案：$correctAnswer');
 
   options = [
     correctAnswer,
     correctAnswer + rand.nextInt(10) + 1,
   ];
+  print('選項（未打亂）：$options');
   options.shuffle();
+  print('選項（打亂後）：$options');
 
   optionColors = [Colors.blue, Colors.blue];
+  print('選項顏色設置完成');
 
   setState(() {
     // 初始化當前間隔時間
     currentIntervalTime = intervalTime;
+    print('初始化當前間隔時間：$currentIntervalTime');
   });
 
   // 啟動一個新的 Timer 來倒數當前間隔時間
@@ -224,13 +261,16 @@ void _generateQuestion() {
     setState(() {
       if (currentIntervalTime > 0) {
         currentIntervalTime--;
+        print('當前間隔時間：$currentIntervalTime');
       } else {
+        print('時間到！進入下一個問題');
         timer.cancel();
         _goToNextQuestion();
       }
     });
   });
-} //_generateQuestion
+}
+
 
   void _goToNextQuestion() {
     completedQuestions++;
@@ -323,10 +363,10 @@ void _generateQuestion() {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             //Text('剩餘時間：$remainingTime 秒', style: TextStyle(fontSize: 24)),  // 這裡是新添加的Widget
-            Text('已回答問題數：$answeredQuestions/$totalQuestions', style: TextStyle(fontSize: 24)),  // 新增的
+            Text('已回答問題數：$answeredQuestions/$totalQuestions', style: TextStyle(fontSize: isTablet(context) ? 24 : 22)),  // 新增的
             //Text('已回答問題數：$answeredQuestions', style: TextStyle(fontSize: 24)),  // 新增的
             //Text('答題數目：$totalQuestions', style: TextStyle(fontSize: 24)),  // 更新這裡
-            Text('間隔倒數時間：$currentIntervalTime 秒', style: TextStyle(fontSize: 24)),
+            Text('間隔倒數時間：$currentIntervalTime 秒', style: TextStyle(fontSize: isTablet(context) ? 24: 22)),
             //Text('間隔時間：$intervalTime 秒', style: TextStyle(fontSize: 24)),  // 更新這裡
             if (currentImagePath != null)
               Image.file(
@@ -334,7 +374,7 @@ void _generateQuestion() {
                 width: 150,
                 height: 150,
               ),
-            Text('$num1 X $num2 = ?', style: TextStyle(fontSize: 120)),
+            Text('$num1 X $num2 = ?', style: TextStyle(fontSize: isTablet(context) ? 120 : 80)),
             SizedBox(height: 50.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,

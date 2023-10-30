@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 class MultiplicationTablePage extends StatefulWidget {
   @override
@@ -9,9 +10,27 @@ class MultiplicationTablePage extends StatefulWidget {
 class _MultiplicationTablePageState extends State<MultiplicationTablePage> {
   List<List<bool>> flippedCards = List.generate(9, (i) => List.filled(8, false));
 
+  bool isTablet(BuildContext context) {
+    // 獲得裝置的實際（邏輯）寬度和高度
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+
+    // 獲得裝置的像素密度
+    double pixelDensity = MediaQuery.of(context).devicePixelRatio;
+
+    // 計算對角線長度
+    double screenDiagonal = sqrt(width * width + height * height);
+
+    // 計算實際的對角線尺寸（英寸）
+    double screenDiagonalInches = screenDiagonal / (pixelDensity * 160);
+
+    // 如果對角線尺寸大於 7 英寸，則通常被認為是平板
+    return screenDiagonalInches >= 7.0;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+      return Scaffold(
       appBar: AppBar(
         title: Text("九九乘法表"),
         backgroundColor: Colors.yellow,
@@ -22,7 +41,7 @@ class _MultiplicationTablePageState extends State<MultiplicationTablePage> {
         children: [
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(68.0),
+              padding: EdgeInsets.all(isTablet(context) ? 68.0 : 48.0),
               child: Table(
                 border: TableBorder.all(color: Colors.black),
                 children: _generateTable(),
@@ -30,7 +49,7 @@ class _MultiplicationTablePageState extends State<MultiplicationTablePage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(75.0),
+            padding: EdgeInsets.all(isTablet(context) ? 75.0 : 45.0),
             child: ElevatedButton.icon(
               onPressed: _resetTable,
               icon: Icon(Icons.refresh, size: 30),
@@ -78,11 +97,14 @@ class _MultiplicationTablePageState extends State<MultiplicationTablePage> {
           child: AnimatedContainer(
             duration: Duration(milliseconds: 500),
             color: colors[i - 2],
-            padding: EdgeInsets.all(12.0),
+            padding: EdgeInsets.all(isTablet(context) ? 12.0 : 6.0),
             child: Center(
               child: Text(
                 flippedCards[j - 1][i - 2] ? '${i * j}' : '$i x $j',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),  // 調整字型大小
+                                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: isTablet(context) ? 20 : 8,  // 根据屏幕宽度设置字体大小
+                  ),
               ),
             ),
           ),
