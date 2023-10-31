@@ -15,7 +15,7 @@ process_image() {
 # 針對 6.7 吋螢幕的設定
 SCREEN_RESOLUTION="1290*2796"
 SCREEN_SIZE=67
-NAMES=("1_mainpage_iphone" "2_multiplication_iphone" "3_settings_iphone")
+NAMES=("1_mainpage_iphone" "2_multiplication_iphone" "3_settings_iphone" "4_test_page_iphone")
 
 for NAME in "${NAMES[@]}"; do
     process_image "$NAME" "$SCREEN_RESOLUTION" "$SCREEN_SIZE"
