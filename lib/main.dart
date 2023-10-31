@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:math';
+import 'device_utils.dart';
 
 String? savedImagePath;  // 全域變數
 
@@ -41,6 +42,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
   List<bool> isSelected = [true, true, true, true, true, true, true, true];
   late List<Widget> _children;
+  bool? isiPad;
+  
 
   final ImagePicker _picker = ImagePicker();
 
@@ -56,15 +59,13 @@ class _MyHomePageState extends State<MyHomePage> {
       print("NelsonDBG: File size: ${await file.length()} bytes");  // 印出文件大小
 
       savedImagePath = image.path;
-      ///* _saveImage失敗，under checking
-      final savedPath = await _saveImage(file);
       setState(() {
-        _imageFile = XFile(savedPath);
+        _imageFile = image;
       });
-      //*/
     }
   }
 
+/*
   Future<String> _saveImage(File imageFile) async {
     final Uint8List bytes = await imageFile.readAsBytes();
     
@@ -78,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
         savedImagePath = result['filePath'];
         return savedImagePath!;
       } else {
-        print('NelsonDBG: filePath is missing or null');
+        //print('NelsonDBG: filePath is missing or null');
         throw Exception(
           'Failed to save the image because filePath is missing or null');
       }
@@ -88,42 +89,32 @@ class _MyHomePageState extends State<MyHomePage> {
           'Failed to save the image. Reason: ${result['errorMessage']}');
     }
   }
-
+*/
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      setState(() {
+        isiPad = DeviceUtils.isIpad(context);
+      });
+    });
     _imgFromCamera().then((_) {
       // 这将在获取图像后被调用
       if (_imageFile == null) {
         // 用户按下取消按钮，可以在这里处理退出应用程序的逻辑
         exit(0); // 使用exit函数退出应用程序
       } else {
+        /*
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => MainPage(),
           ),
+          
         );
+        */
       }
     });
-  }
-
-  bool isTablet(BuildContext context) {
-    // 獲得裝置的實際（邏輯）寬度和高度
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-
-    // 獲得裝置的像素密度
-    double pixelDensity = MediaQuery.of(context).devicePixelRatio;
-
-    // 計算對角線長度
-    double screenDiagonal = sqrt(width * width + height * height);
-
-    // 計算實際的對角線尺寸（英寸）
-    double screenDiagonalInches = screenDiagonal / (pixelDensity * 160);
-
-    // 如果對角線尺寸大於 7 英寸，則通常被認為是平板
-    return screenDiagonalInches >= 7.0;
   }
 
   @override
@@ -151,7 +142,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 child: Text(
                   "九九乘法表",
-                  style: TextStyle(fontSize: isTablet(context) ? 120: 40),
+                  style: TextStyle(fontSize: isiPad! ? 120: 40),
                 ),
               ),
             ),
@@ -167,13 +158,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.deepPurple, // 按鈕背景色
-                  onPrimary: Colors.white, // 按鈕文字色
+                  backgroundColor: Colors.deepPurple, // 按鈕背景色
+                  foregroundColor: Colors.white, // 按鈕文字色
                   minimumSize: Size(200, 60),
                 ),
                 child: Text(
                   "進入挑戰",
-                  style: TextStyle(fontSize: isTablet(context) ? 120: 40),
+                  style: TextStyle(fontSize: isiPad! ? 120: 40),
                 ),
               ),
             ),

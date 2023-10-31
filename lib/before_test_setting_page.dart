@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/cupertino.dart';
 import 'main.dart';
-import 'dart:math';
+//import 'dart:math';
+import 'device_utils.dart';
 
 class BeforeTestSettingPage extends StatefulWidget {
   @override
@@ -16,12 +17,20 @@ class _BeforeTestSettingPageState extends State<BeforeTestSettingPage> {
   late SharedPreferences _prefs;
   ValueKey<int> _pickerKey = ValueKey<int>(0);  // 新增一個ValueKey
   List<bool> isSelected = List.generate(8, (index) => true);
+  bool? isiPad;
 
   @override
   void initState() {
+    print("Enter initState");
     super.initState();
     _loadPreferences();
     _loadSettings();
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      setState(() {
+        isiPad = DeviceUtils.isIpad(context);
+      });
+    });
+    print("Exit initState");
   }
 
   _loadSettings() async {
@@ -42,6 +51,7 @@ class _BeforeTestSettingPageState extends State<BeforeTestSettingPage> {
   }
 
   _loadPreferences() async {
+    print("Enter _loadPreferences");
     _prefs = await SharedPreferences.getInstance();
     setState(() {
       _selectedQuestions = _prefs.getInt('questions') ?? 10;
@@ -51,33 +61,16 @@ class _BeforeTestSettingPageState extends State<BeforeTestSettingPage> {
   }
 
   _savePreferences() async {
+    print("Enter _savePreferences");
     await _prefs.setInt('questions', _selectedQuestions);
     await _prefs.setDouble('time', _selectedTime);
   }
 
-  bool isTablet(BuildContext context) {
-    // 獲得裝置的實際（邏輯）寬度和高度
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-
-    // 獲得裝置的像素密度
-    double pixelDensity = MediaQuery.of(context).devicePixelRatio;
-
-    // 計算對角線長度
-    double screenDiagonal = sqrt(width * width + height * height);
-
-    // 計算實際的對角線尺寸（英寸）
-    double screenDiagonalInches = screenDiagonal / (pixelDensity * 160);
-
-    // 如果對角線尺寸大於 7 英寸，則通常被認為是平板
-    return screenDiagonalInches >= 7.0;
-  }
-
   @override
   Widget build(BuildContext context) {
+    print("Enter build");
     int minutes = (_selectedTime ~/ 60).toInt();  // 從 _selectedTime 提取分鐘
     int seconds = (_selectedTime % 60).toInt();  // 從 _selectedTime 提取秒數
-    //final bool tablet = isTablet(context);
     
     return Scaffold(
       appBar: AppBar(
@@ -97,10 +90,10 @@ class _BeforeTestSettingPageState extends State<BeforeTestSettingPage> {
     ),      
       backgroundColor: Colors.yellow,
       body: Padding(
-        padding: EdgeInsets.all(isTablet(context) ? 48.0 : 16.0),
+        padding: EdgeInsets.all(isiPad! ? 32.0 : 16.0),
         child: Column(
           children: [
-            Text("題數", style: TextStyle(fontSize: isTablet(context) ? 60: 30, fontWeight: FontWeight.bold)),
+            Text("題數", style: TextStyle(fontSize: isiPad! ? 54 : 30, fontWeight: FontWeight.bold)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [10, 20, 30].map((int value) {
@@ -117,13 +110,13 @@ class _BeforeTestSettingPageState extends State<BeforeTestSettingPage> {
                         });
                       },
                     ),
-                    Text("$value", style: TextStyle(fontSize: isTablet(context) ? 54 : 28)),
+                    Text("$value", style: TextStyle(fontSize: isiPad! ? 42 : 28)),
                   ],
                 );
               }).toList(),
             ),
             SizedBox(height: 30),
-            Text("答題間隔時間(至少5秒): ${_formatTime()}", style: TextStyle(fontSize: isTablet(context) ? 60 : 18, fontWeight: FontWeight.bold)),
+            Text("答題間隔時間(至少5秒): ${_formatTime()}", style: TextStyle(fontSize: isiPad! ? 48 : 18, fontWeight: FontWeight.bold)),
             Container(
               height: MediaQuery.of(context).copyWith().size.height / 3,
               child: CupertinoTimerPicker(
@@ -147,13 +140,14 @@ class _BeforeTestSettingPageState extends State<BeforeTestSettingPage> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: isTablet(context) ? _navigateToTestPage : null,  // 根據裝置類型設定onPressed
+              //onPressed: isiPad! ? _navigateToTestPage : null,  // 根據裝置類型設定onPressed
+              onPressed: _navigateToTestPage,  // 根據裝置類型設定onPressed
               style: ElevatedButton.styleFrom(
                 primary: Colors.deepPurple,
                 onPrimary: Colors.white,
                 minimumSize: Size(200, 60),
               ),
-              child: Text("開始計時", style: TextStyle(fontSize: isTablet(context) ? 30: 20)),
+              child: Text("開始計時", style: TextStyle(fontSize: isiPad! ? 30: 20)),
             ),
             SizedBox(height: 10),
             ElevatedButton(
@@ -163,7 +157,7 @@ class _BeforeTestSettingPageState extends State<BeforeTestSettingPage> {
                 onPrimary: Colors.white,
                 minimumSize: Size(200, 60),
               ),
-              child: Text("重置", style: TextStyle(fontSize: isTablet(context) ? 24 : 16)),
+              child: Text("重置", style: TextStyle(fontSize: isiPad! ? 24 : 16)),
             ),
           ],
         ),

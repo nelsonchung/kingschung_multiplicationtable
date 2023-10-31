@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'test_page.dart';
 import 'setting_page.dart';
+import 'device_utils.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -9,16 +10,18 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  int _currentIndex = 0;
+  int _currentIndex = 1;
   late List<Widget> _children;
-  //List<bool> isSelected = [true, true, true, true, true, true, true, true];
-
-  // 假設這是一個File對象，您需要根據實際情況來賦值
-  //File? someFile;
+  bool? isiPad;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      setState(() {
+        isiPad = DeviceUtils.isIpad(context);
+      });
+    });
     _children = [
       TestPage(), // 傳遞 capturedImage 參數
       SettingPage(),
